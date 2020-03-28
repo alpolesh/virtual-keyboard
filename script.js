@@ -3,11 +3,14 @@ const Keyboard = {
     main: null,
     keysContainer: null,
     keys: [],
+    input_container: null,
+    input_area: null,
   },
 
   properties: {
     value: '',
     capsLock: false,
+    isTyped: true,
   },
 
   init() {
@@ -18,10 +21,25 @@ const Keyboard = {
     this.elements.keysContainer = document.createElement('div');
     this.elements.keysContainer.classList.add('keyboard__keys');
 
+    this.elements.input_container = document.createElement('div');
+    this.elements.input_container.classList.add('input-area-container');
+    this.elements.input_area = document.createElement('textarea');
+    this.elements.input_area.classList.add('keyboard__input-area');
+
     // Add to DOM
     document.body.prepend(this.elements.main);
+    document.querySelector('.keyboard').prepend(this.elements.input_container);
+    document.querySelector('.input-area-container').append(this.elements.input_area);
     document.querySelector('.keyboard').append(this.elements.keysContainer);
     document.querySelector('.keyboard__keys').append(this.createKeys());
+
+    // Connect input area
+    document.querySelector('.keyboard__input-area').addEventListener('focus', (event) => {
+      this.properties.isTyped = true;
+    });
+    document.querySelector('.keyboard__input-area').addEventListener('input', (event) => {
+      this.properties.value = document.querySelector('.keyboard__input-area').value;
+    });
   },
 
   createKeys() {
@@ -41,15 +59,35 @@ const Keyboard = {
       keyElement.classList.add('keyboard__key');
 
       // Add symbol
+      if (key === 'Backspace' || key === 'Tab' || key === 'Caps Lock' || key === 'Enter' || key === 'Shift' || key === 'Ctrl' || key === 'Alt') {
+        keyElement.classList.add('keyboard__key_wide');
+      } else if (key === 'Space') {
+        keyElement.classList.add('keyboard__key_extra-wide');
+      }
+
       keyElement.textContent = key.toLowerCase();
+      keyElement.addEventListener('click', (event) => {
+        if (this.properties.isTyped) {
+          this.properties.value += key.toLowerCase();
+          this.triggerEvent();
+        }
+      });
 
       // Add button to fragment
+
       fragmentKeys.append(keyElement);
       if (breaks) {
         fragmentKeys.append(document.createElement('br'));
       }
     });
     return fragmentKeys;
+  },
+
+  triggerEvent() {
+    document.querySelector('.keyboard__input-area').value = this.properties.value;
+    document.addEventListener('keydown', (event) => {
+
+    });
   },
 
   toggleCapslock() {
