@@ -15,6 +15,7 @@ const Keyboard = {
 
   init() {
     // Create master elements
+
     this.elements.main = document.createElement('div');
     this.elements.main.classList.add('keyboard');
 
@@ -33,12 +34,10 @@ const Keyboard = {
     document.querySelector('.keyboard').append(this.elements.keysContainer);
     document.querySelector('.keyboard__keys').append(this.createKeys());
 
-    // Connect input area
-    document.querySelector('.keyboard__input-area').addEventListener('focus', (event) => {
-      this.properties.isTyped = true;
-    });
-    document.querySelector('.keyboard__input-area').addEventListener('input', (event) => {
-      this.properties.value = document.querySelector('.keyboard__input-area').value;
+    // Connect pushing buttons
+    document.addEventListener('keydown', (event) => {
+      document.querySelector('.keyboard__input-area').focus();
+      this.pushKey();
     });
   },
 
@@ -50,27 +49,52 @@ const Keyboard = {
       'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'Shift', '↑',
       'Ctrl', 'Win', 'Alt', 'Space', 'Alt', 'Ctrl', '←', '↓', '→'];
 
-    keyboardKeys.forEach((key) => {
-      const breaks = ['Backspace', 'Del', 'Enter', '↑', '→'].indexOf(key) !== -1;
+    const keyCodes = ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0',
+      'Minus', 'Equal', 'Backspace', 'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft',
+      'BracketRight', 'Backslash', 'Delete', 'CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon',
+      'Quote', 'Enter', 'ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ShiftRight', 'ArrowUp',
+      'ControlLeft', 'MetaLeft', 'AltLeft', 'Space', 'AltRight', 'ControlRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight'];
+
+    for (let i = 0; i < keyboardKeys.length; i += 1) {
+      const breaks = ['Backspace', 'Del', 'Enter', '↑', '→'].indexOf(keyboardKeys[i]) !== -1;
       const keyElement = document.createElement('button');
 
       // Add attributes and classes
       keyElement.setAttribute('type', 'button');
       keyElement.classList.add('keyboard__key');
+      keyElement.keyCode = keyCodes[i];
 
       // Add symbol
-      if (key === 'Backspace' || key === 'Tab' || key === 'Caps Lock' || key === 'Enter' || key === 'Shift' || key === 'Ctrl' || key === 'Alt') {
+      if (keyboardKeys[i] === 'Backspace' || keyboardKeys[i] === 'Tab' || keyboardKeys[i] === 'Caps Lock' || keyboardKeys[i] === 'Enter' || keyboardKeys[i] === 'Shift' || keyboardKeys[i] === 'Ctrl' || keyboardKeys[i] === 'Alt') {
         keyElement.classList.add('keyboard__key_wide');
-      } else if (key === 'Space') {
+      } else if (keyboardKeys[i] === 'Space') {
         keyElement.classList.add('keyboard__key_extra-wide');
       }
 
-      keyElement.textContent = key.toLowerCase();
+      keyElement.textContent = keyboardKeys[i].toLowerCase();
       keyElement.addEventListener('click', (event) => {
-        if (this.properties.isTyped) {
-          this.properties.value += key.toLowerCase();
-          this.triggerEvent();
+        document.querySelector('.keyboard__input-area').focus();
+        switch (event.target.keyCode) {
+          case 'Space':
+            document.querySelector('.keyboard__input-area').value += ' ';
+            break;
+          case 'Backspace':
+            document.querySelector('.keyboard__input-area').value = document.querySelector('.keyboard__input-area').value.slice(0, -1);
+            break;
+          case 'Enter':
+            document.querySelector('.keyboard__input-area').value += '\n';
+            break;
+          default:
+            document.querySelector('.keyboard__input-area').value += keyboardKeys[i].toLowerCase();
         }
+
+        function removeClass() {
+          keyElement.classList.remove('keyboard__key_active');
+        }
+        keyElement.classList.add('keyboard__key_active');
+        setTimeout(removeClass, 200);
+
+        // this.triggerEvent();
       });
 
       // Add button to fragment
@@ -79,19 +103,29 @@ const Keyboard = {
       if (breaks) {
         fragmentKeys.append(document.createElement('br'));
       }
-    });
+    }
     return fragmentKeys;
   },
 
+  /*
   triggerEvent() {
     document.querySelector('.keyboard__input-area').value = this.properties.value;
-    document.addEventListener('keydown', (event) => {
-
-    });
   },
+  */
 
   toggleCapslock() {
 
+  },
+
+  pushKey() {
+    document.querySelectorAll('.keyboard__key').forEach((el) => {
+      if (el.keyCode === event.code) {
+        el.classList.add('keyboard__key_active');
+        document.addEventListener('keyup', (event) => {
+          el.classList.remove('keyboard__key_active');
+        });
+      }
+    });
   },
 
 };

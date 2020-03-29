@@ -55,6 +55,10 @@
   cursor: pointer;
 }
 
+.keyboard__key_active {
+  background-color: red;
+}
+
 .keyboard__key_wide {
   width: 8%;
 }
