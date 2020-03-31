@@ -11,6 +11,7 @@ const Keyboard = {
     value: '',
     capsLock: false,
     isTyped: true,
+    language: 'eng',
   },
 
   init() {
@@ -35,10 +36,9 @@ const Keyboard = {
     document.querySelector('.keyboard__keys').append(this.createKeys());
 
     // Connect pushing buttons
-    document.addEventListener('keydown', (event) => {
-      document.querySelector('.keyboard__input-area').focus();
-      this.pushKey();
-    });
+    document.querySelector('.keyboard__input-area').focus();
+    this.pushKey();
+    this.clickButton();
   },
 
   createKeys() {
@@ -62,40 +62,17 @@ const Keyboard = {
       // Add attributes and classes
       keyElement.setAttribute('type', 'button');
       keyElement.classList.add('keyboard__key');
-      keyElement.keyCode = keyCodes[i];
-
-      // Add symbol
       if (keyboardKeys[i] === 'Backspace' || keyboardKeys[i] === 'Tab' || keyboardKeys[i] === 'Caps Lock' || keyboardKeys[i] === 'Enter' || keyboardKeys[i] === 'Shift' || keyboardKeys[i] === 'Ctrl' || keyboardKeys[i] === 'Alt') {
         keyElement.classList.add('keyboard__key_wide');
       } else if (keyboardKeys[i] === 'Space') {
         keyElement.classList.add('keyboard__key_extra-wide');
       }
 
+      keyElement.keyCode = keyCodes[i];
+
+      // Creation buttons across the language
+      keyElement.keyKey = keyboardKeys[i];
       keyElement.textContent = keyboardKeys[i].toLowerCase();
-      keyElement.addEventListener('click', (event) => {
-        document.querySelector('.keyboard__input-area').focus();
-        switch (event.target.keyCode) {
-          case 'Space':
-            document.querySelector('.keyboard__input-area').value += ' ';
-            break;
-          case 'Backspace':
-            document.querySelector('.keyboard__input-area').value = document.querySelector('.keyboard__input-area').value.slice(0, -1);
-            break;
-          case 'Enter':
-            document.querySelector('.keyboard__input-area').value += '\n';
-            break;
-          default:
-            document.querySelector('.keyboard__input-area').value += keyboardKeys[i].toLowerCase();
-        }
-
-        function removeClass() {
-          keyElement.classList.remove('keyboard__key_active');
-        }
-        keyElement.classList.add('keyboard__key_active');
-        setTimeout(removeClass, 200);
-
-        // this.triggerEvent();
-      });
 
       // Add button to fragment
 
@@ -118,6 +95,30 @@ const Keyboard = {
   },
 
   pushKey() {
+    document.addEventListener('keydown', (event) => {
+      event.preventDefault();
+      this.activateButton();
+      document.querySelector('.keyboard__input-area').focus();
+      switch (event.code) {
+        case 'Space':
+          document.querySelector('.keyboard__input-area').value += ' ';
+          break;
+        case 'Backspace':
+          document.querySelector('.keyboard__input-area').value = document.querySelector('.keyboard__input-area').value.slice(0, -1);
+          break;
+        case 'Enter':
+          document.querySelector('.keyboard__input-area').value += '\n';
+          break;
+        case 'Tab':
+          document.querySelector('.keyboard__input-area').value += '  ';
+          break;
+        default:
+          document.querySelector('.keyboard__input-area').value += event.key;
+      }
+    });
+  },
+
+  activateButton() {
     document.querySelectorAll('.keyboard__key').forEach((el) => {
       if (el.keyCode === event.code) {
         el.classList.add('keyboard__key_active');
@@ -128,6 +129,33 @@ const Keyboard = {
     });
   },
 
+  clickButton() {
+    document.querySelector('.keyboard__keys').addEventListener('click', (event) => {
+      document.querySelector('.keyboard__input-area').focus();
+      switch (event.target.keyCode) {
+        case 'Space':
+          document.querySelector('.keyboard__input-area').value += ' ';
+          break;
+        case 'Backspace':
+          document.querySelector('.keyboard__input-area').value = document.querySelector('.keyboard__input-area').value.slice(0, -1);
+          break;
+        case 'Enter':
+          document.querySelector('.keyboard__input-area').value += '\n';
+          break;
+        case 'Tab':
+          document.querySelector('.keyboard__input-area').value += '  ';
+          break;
+        default:
+          document.querySelector('.keyboard__input-area').value += event.target.keyKey.toLowerCase();
+      }
+
+      function removeClass() {
+        event.target.classList.remove('keyboard__key_active');
+      }
+      event.target.classList.add('keyboard__key_active');
+      setTimeout(removeClass, 200);
+    });
+  },
 };
 
 window.addEventListener('DOMContentLoaded', () => {
