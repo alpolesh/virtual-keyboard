@@ -39,6 +39,8 @@ const Keyboard = {
     document.querySelector('.keyboard__input-area').focus();
     this.pushKey();
     this.clickButton();
+    this.pressShift();
+    this.activateButtonMouse();
   },
 
   createKeys() {
@@ -84,20 +86,10 @@ const Keyboard = {
     return fragmentKeys;
   },
 
-  /*
-  triggerEvent() {
-    document.querySelector('.keyboard__input-area').value = this.properties.value;
-  },
-  */
-
-  toggleCapslock() {
-
-  },
-
   pushKey() {
     document.addEventListener('keydown', (event) => {
       event.preventDefault();
-      this.activateButton();
+      this.activateButtonPush();
       document.querySelector('.keyboard__input-area').focus();
       switch (event.code) {
         case 'Space':
@@ -112,13 +104,20 @@ const Keyboard = {
         case 'Tab':
           document.querySelector('.keyboard__input-area').value += '  ';
           break;
+        case 'CapsLock':
+          this.toggleCapslock();
+          break;
         default:
-          document.querySelector('.keyboard__input-area').value += event.key;
+          if (this.properties.capsLock === false) {
+            document.querySelector('.keyboard__input-area').value += event.key.toLowerCase();
+          } else {
+            document.querySelector('.keyboard__input-area').value += event.key.toUpperCase();
+          }
       }
     });
   },
 
-  activateButton() {
+  activateButtonPush() {
     document.querySelectorAll('.keyboard__key').forEach((el) => {
       if (el.keyCode === event.code) {
         el.classList.add('keyboard__key_active');
@@ -145,17 +144,101 @@ const Keyboard = {
         case 'Tab':
           document.querySelector('.keyboard__input-area').value += '  ';
           break;
+        case 'CapsLock':
+          this.toggleCapslock();
+          break;
+        case 'ShiftLeft':
+          document.querySelector('.keyboard__input-area').value += '';
+          break;
+        case 'ShiftRight':
+          document.querySelector('.keyboard__input-area').value += '';
+          break;
         default:
-          document.querySelector('.keyboard__input-area').value += event.target.keyKey.toLowerCase();
+          if (this.properties.capsLock === false) {
+            document.querySelector('.keyboard__input-area').value += event.target.keyKey.toLowerCase();
+          } else {
+            document.querySelector('.keyboard__input-area').value += event.target.keyKey.toUpperCase();
+          }
       }
-
-      function removeClass() {
-        event.target.classList.remove('keyboard__key_active');
-      }
-      event.target.classList.add('keyboard__key_active');
-      setTimeout(removeClass, 200);
     });
   },
+
+  toggleCapslock() {
+    if (this.properties.capsLock === false) {
+      document.querySelectorAll('.keyboard__key').forEach((el) => {
+        const button = el;
+        if (this.languages.letters.includes(el.keyKey)) {
+          button.textContent = el.textContent.toUpperCase();
+        }
+      });
+      this.properties.capsLock = true;
+    } else {
+      document.querySelectorAll('.keyboard__key').forEach((el) => {
+        const button = el;
+        if (this.languages.letters.includes(el.keyKey)) {
+          button.textContent = el.textContent.toLowerCase();
+        }
+      });
+      this.properties.capsLock = false;
+    }
+  },
+
+  pressShift() {
+    document.querySelectorAll('.keyboard__key')[42].classList.add('shift');
+    document.querySelectorAll('.keyboard__key')[53].classList.add('shift');
+    document.querySelector('.keyboard__keys').addEventListener('mousedown', (event) => {
+      if (event.target.classList.contains('shift')) {
+        document.querySelectorAll('.keyboard__key').forEach((el, index) => {
+          const button = el;
+          button.textContent = this.languages.shift_eng[index];
+        });
+      }
+    });
+    document.querySelector('.keyboard__keys').addEventListener('mouseup', (event) => {
+      if (event.target.classList.contains('shift')) {
+        document.querySelectorAll('.keyboard__key').forEach((el, index) => {
+          const button = el;
+          button.textContent = this.languages.english[index];
+        });
+      }
+    });
+  },
+
+  activateButtonMouse() {
+    document.querySelector('.keyboard__keys').addEventListener('mousedown', (event) => {
+      if (event.target.tagName === 'BUTTON') {
+        event.target.classList.add('keyboard__key_active');
+      }
+    });
+    document.querySelector('.keyboard__keys').addEventListener('mouseup', (event) => {
+      if (event.target.tagName === 'BUTTON') {
+        event.target.classList.remove('keyboard__key_active');
+      }
+    });
+    document.querySelector('.keyboard__keys').addEventListener('mouseout', (event) => {
+      if (event.target.tagName === 'BUTTON' && event.target.keyKey !== 'Shift') {
+        event.target.classList.remove('keyboard__key_active');
+      }
+    });
+  },
+
+  languages: {
+    letters: ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+      'z', 'x', 'c', 'v', 'b', 'n', 'm'],
+
+    english: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
+      'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'Del',
+      'Caps Lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
+      'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'Shift', '↑',
+      'Ctrl', 'Win', 'Alt', 'Space', 'Alt', 'Ctrl', '←', '↓', '→'],
+
+    shift_eng: ['~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace',
+      'Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '|', 'Del',
+      'Caps Lock', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', 'Enter',
+      'Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 'Shift', '↑',
+      'Ctrl', 'Win', 'Alt', 'Space', 'Alt', 'Ctrl', '←', '↓', '→'],
+  },
+
 };
 
 window.addEventListener('DOMContentLoaded', () => {
