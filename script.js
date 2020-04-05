@@ -99,29 +99,41 @@ const Keyboard = {
   },
 
   pushKey() {
+    const input = document.querySelector('.keyboard__input-area');
     document.addEventListener('keydown', (event) => {
       event.preventDefault();
       this.activateButtonPush();
-      document.querySelector('.keyboard__input-area').focus();
+      input.focus();
       switch (event.code) {
         case 'Space':
-          document.querySelector('.keyboard__input-area').value += ' ';
+          input.setRangeText(' ', input.selectionStart, input.selectionEnd, 'end');
           break;
         case 'Backspace':
-          document.querySelector('.keyboard__input-area').value = document.querySelector('.keyboard__input-area').value.slice(0, -1);
+          if (input.selectionStart === input.selectionEnd) {
+            input.setSelectionRange(input.selectionStart - 1, input.selectionEnd);
+            input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
+          }
+          input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
+          break;
+        case 'Delete':
+          if (input.selectionStart === input.selectionEnd) {
+            input.setSelectionRange(input.selectionStart, input.selectionStart + 1);
+            input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
+          }
+          input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
           break;
         case 'Enter':
-          document.querySelector('.keyboard__input-area').value += '\n';
+          input.setRangeText('\n', input.selectionStart, input.selectionEnd, 'end');
           break;
         case 'Tab':
-          document.querySelector('.keyboard__input-area').value += '  ';
+          input.setRangeText('    ', input.selectionStart, input.selectionEnd, 'end');
           break;
         case 'CapsLock':
           this.toggleCapslock();
           this.capsAndShift();
           break;
         case 'ShiftLeft':
-          document.querySelector('.keyboard__input-area').value += '';
+          input.value += '';
           if (this.properties.alt === true) {
             if (this.properties.language === 'eng') {
               this.properties.language = 'rus';
@@ -132,8 +144,15 @@ const Keyboard = {
           }
           break;
         case 'ShiftRight':
-          document.querySelector('.keyboard__input-area').value += '';
-
+          input.value += '';
+          if (this.properties.alt === true) {
+            if (this.properties.language === 'eng') {
+              this.properties.language = 'rus';
+            } else if (this.properties.language === 'rus') {
+              this.properties.language = 'eng';
+            }
+            this.switchLanguage();
+          }
           break;
         case 'AltLeft':
           if (this.properties.shift === true) {
@@ -152,34 +171,34 @@ const Keyboard = {
           });
           break;
         case 'AltRight':
-          document.querySelector('.keyboard__input-area').value += '';
+          input.value += '';
           break;
         case 'ControlLeft':
-          document.querySelector('.keyboard__input-area').value += '';
+          input.value += '';
           break;
         case 'ControlRight':
-          document.querySelector('.keyboard__input-area').value += '';
+          input.value += '';
           break;
         case 'MetaLeft':
-          document.querySelector('.keyboard__input-area').value += '';
+          input.value += '';
           break;
         case 'ArrowLeft':
-          document.querySelector('.keyboard__input-area').value += '←';
+          input.setRangeText('←', input.selectionStart, input.selectionEnd, 'end');
           break;
         case 'ArrowRight':
-          document.querySelector('.keyboard__input-area').value += '→';
+          input.setRangeText('→', input.selectionStart, input.selectionEnd, 'end');
           break;
         case 'ArrowDown':
-          document.querySelector('.keyboard__input-area').value += '↓';
+          input.setRangeText('↓', input.selectionStart, input.selectionEnd, 'end');
           break;
         case 'ArrowUp':
-          document.querySelector('.keyboard__input-area').value += '↑';
+          input.setRangeText('↑', input.selectionStart, input.selectionEnd, 'end');
           break;
         default:
           if (this.languages.keyCodes.includes(event.code)) {
             document.querySelectorAll('.keyboard__key').forEach((el) => {
               if (el.keyCode === event.code) {
-                document.querySelector('.keyboard__input-area').value += el.textContent;
+                input.setRangeText(el.textContent, input.selectionStart, input.selectionEnd, 'end');
               }
             });
           }
@@ -205,21 +224,33 @@ const Keyboard = {
   },
 
   clickButton() {
+    const input = document.querySelector('.keyboard__input-area');
     document.querySelector('.keyboard__keys').addEventListener('click', (event) => {
       if (event.target.tagName === 'BUTTON') {
-        document.querySelector('.keyboard__input-area').focus();
+        input.focus();
         switch (event.target.keyCode) {
           case 'Space':
-            document.querySelector('.keyboard__input-area').value += ' ';
+            input.setRangeText(' ', input.selectionStart, input.selectionEnd, 'end');
             break;
           case 'Backspace':
-            document.querySelector('.keyboard__input-area').value = document.querySelector('.keyboard__input-area').value.slice(0, -1);
+            if (input.selectionStart === input.selectionEnd) {
+              input.setSelectionRange(input.selectionStart - 1, input.selectionEnd);
+              input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
+            }
+            input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
+            break;
+          case 'Delete':
+            if (input.selectionStart === input.selectionEnd) {
+              input.setSelectionRange(input.selectionStart, input.selectionStart + 1);
+              input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
+            }
+            input.setRangeText('', input.selectionStart, input.selectionEnd, 'end');
             break;
           case 'Enter':
-            document.querySelector('.keyboard__input-area').value += '\n';
+            input.setRangeText('\n', input.selectionStart, input.selectionEnd, 'end');
             break;
           case 'Tab':
-            document.querySelector('.keyboard__input-area').value += '  ';
+            input.setRangeText('    ', input.selectionStart, input.selectionEnd, 'end');
             break;
           case 'CapsLock':
             this.toggleCapslock();
@@ -229,13 +260,22 @@ const Keyboard = {
             }
             break;
           case 'ShiftLeft':
-            document.querySelector('.keyboard__input-area').value += '';
+            input.value += '';
             this.capsAndShift();
-            this.properties.lastButtonShift = true;
+            if (this.properties.lastButtonShift) {
+              this.properties.lastButtonShift = false;
+            } else {
+              this.properties.lastButtonShift = true;
+            }
             break;
           case 'ShiftRight':
-            document.querySelector('.keyboard__input-area').value += '';
+            input.value += '';
             this.capsAndShift();
+            if (this.properties.lastButtonShift) {
+              this.properties.lastButtonShift = false;
+            } else {
+              this.properties.lastButtonShift = true;
+            }
             break;
           case 'AltLeft':
             if (this.properties.lastButtonShift) {
@@ -248,8 +288,20 @@ const Keyboard = {
             }
             this.properties.lastButtonShift = false;
             break;
+          case 'AltRight':
+            input.value += '';
+            break;
+          case 'ControlLeft':
+            input.value += '';
+            break;
+          case 'ControlRight':
+            input.value += '';
+            break;
+          case 'MetaLeft':
+            input.value += '';
+            break;
           default:
-            document.querySelector('.keyboard__input-area').value += event.target.textContent;
+            input.setRangeText(event.target.textContent, input.selectionStart, input.selectionEnd, 'end');
         }
       }
     });
@@ -349,16 +401,10 @@ const Keyboard = {
     });
     document.querySelector('.keyboard__keys').addEventListener('mouseup', (event) => {
       if (event.target.tagName === 'BUTTON' && event.target.keyKey === 'alt') {
-        document.querySelector('.shift').classList.remove('keyboard__key_active');
+        document.querySelectorAll('.shift')[0].classList.remove('keyboard__key_active');
+        document.querySelectorAll('.shift')[1].classList.remove('keyboard__key_active');
+        event.target.classList.remove('keyboard__key_active');
         this.properties.shift = false;
-        document.querySelectorAll('.keyboard__key').forEach((el, index) => {
-          const button = el;
-          if (this.properties.language === 'eng') {
-            button.textContent = this.languages.english[index];
-          } else if (this.properties.language === 'rus') {
-            button.textContent = this.languages.rus[index];
-          }
-        });
       } else if (event.target.tagName === 'BUTTON' && event.target.keyKey !== 'shift') {
         event.target.classList.remove('keyboard__key_active');
       }

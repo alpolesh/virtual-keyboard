@@ -10,7 +10,7 @@
 }
 
 .keyboard{
-  background-color: #004140;
+  background-color: black;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -56,13 +56,23 @@
 }
 
 .keyboard__key_active {
-  background-color: red;
+  background-color: #CEAF11;
+  border-radius: 0%;
+  animation: round 40ms linear 0s 1 normal forwards;
+}
+
+.keyboard__key_active:focus {
+  outline: none;
+}
+
+@keyframes round {
+  from {border-radius: 0%;}
+  to {border-radius: 50%;}
 }
 
 .keyboard__key_wide {
   width: 8%;
 }
-
 .keyboard__key_extra-wide {
   width: 24%;
   max-width: 500px;
