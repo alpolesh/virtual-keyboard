@@ -33,16 +33,23 @@ const Keyboard = {
 
     this.elements.additional_text = document.createElement('p');
     this.elements.additional_text.classList.add('keyboard__additional-text');
+    const changingLanguage = document.createElement('p');
+    changingLanguage.classList.add('input-area-container__text');
+    const developeText = document.createElement('p');
+    developeText.classList.add('keyboard__develope-text');
 
     // Add to DOM
     document.body.prepend(this.elements.main);
     document.querySelector('.keyboard').prepend(this.elements.input_container);
     document.querySelector('.input-area-container').append(this.elements.input_area);
+    document.querySelector('.input-area-container').append(changingLanguage);
+    changingLanguage.textContent = 'Change language: Shift + left alt';
+    document.querySelector('.input-area-container').append(this.elements.additional_text);
+    document.querySelector('.keyboard__additional-text').textContent = `Language: ${this.properties.language}`;
     document.querySelector('.keyboard').append(this.elements.keysContainer);
     document.querySelector('.keyboard__keys').append(this.createKeys());
-    document.querySelector('.keyboard').append(this.elements.additional_text);
-
-    document.querySelector('.keyboard__additional-text').textContent = `Язык: ${this.properties.language}`;
+    document.querySelector('.keyboard').append(developeText);
+    developeText.textContent = 'The keyboard was developed on Windows OS';
 
     // Connect pushing buttons
     document.querySelector('.keyboard__input-area').focus();
@@ -71,15 +78,19 @@ const Keyboard = {
 
     for (let i = 0; i < keyboardKeys.length; i += 1) {
       const breaks = ['backspace', 'del', 'enter', '↑', '→'].indexOf(keyboardKeys[i]) !== -1;
+      const buttonContainer = document.createElement('div');
+      buttonContainer.classList.add('keyboard__button-container');
       const keyElement = document.createElement('button');
+      buttonContainer.append(keyElement);
+
 
       // Add attributes and classes
       keyElement.setAttribute('type', 'button');
       keyElement.classList.add('keyboard__key');
       if (keyboardKeys[i] === 'backspace' || keyboardKeys[i] === 'tab' || keyboardKeys[i] === 'caps lock' || keyboardKeys[i] === 'enter' || keyboardKeys[i] === 'shift' || keyboardKeys[i] === 'ctrl' || keyboardKeys[i] === 'alt') {
-        keyElement.classList.add('keyboard__key_wide');
+        buttonContainer.classList.add('keyboard__key_wide');
       } else if (keyboardKeys[i] === 'space') {
-        keyElement.classList.add('keyboard__key_extra-wide');
+        buttonContainer.classList.add('keyboard__key_extra-wide');
       }
 
       keyElement.keyCode = keyCodes[i];
@@ -90,7 +101,7 @@ const Keyboard = {
 
       // Add button to fragment
 
-      fragmentKeys.append(keyElement);
+      fragmentKeys.append(buttonContainer);
       if (breaks) {
         fragmentKeys.append(document.createElement('br'));
       }
@@ -226,7 +237,7 @@ const Keyboard = {
   clickButton() {
     const input = document.querySelector('.keyboard__input-area');
     document.querySelector('.keyboard__keys').addEventListener('click', (event) => {
-      if (event.target.tagName === 'BUTTON') {
+      if (event.target.tagName === 'BUTTON' || event.target.className === 'keyboard__button-container') {
         input.focus();
         switch (event.target.keyCode) {
           case 'Space':
@@ -433,7 +444,7 @@ const Keyboard = {
   },
 
   switchLanguage() {
-    document.querySelector('.keyboard__additional-text').textContent = `Язык: ${this.properties.language}`;
+    document.querySelector('.keyboard__additional-text').textContent = `Language: ${this.properties.language}`;
     if (this.properties.language === 'eng') {
       document.querySelectorAll('.keyboard__key').forEach((el, index) => {
         const button = el;
@@ -489,6 +500,9 @@ const Keyboard = {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('language') === null) {
+    localStorage.setItem('language', 'eng');
+  }
   Keyboard.properties.language = localStorage.getItem('language');
   Keyboard.init();
 });
